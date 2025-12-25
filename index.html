@@ -8,13 +8,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=JetBrains+Mono:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
     
     <style>
         :root { 
             --bg-color: #000000; 
             --text-color: #ffffff;
-            --panel-bg: rgba(30, 30, 30, 0.95);
+            --panel-bg: rgba(30, 30, 30, 0.96);
             --input-bg: rgba(255, 255, 255, 0.12);
         }
 
@@ -35,84 +35,43 @@
             transition: font-size 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 修正後的控制面板 */
         #controls {
-            position: fixed; bottom: 30px; left: 50%;
+            position: fixed; bottom: 25px; left: 50%;
             transform: translate(-50%, 0);
             background: var(--panel-bg);
-            padding: 18px 12px; border-radius: 28px;
-            display: flex; flex-direction: column; align-items: center; gap: 14px;
+            padding: 18px; border-radius: 28px;
+            display: flex; flex-direction: column; align-items: center; gap: 16px;
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             opacity: 0; visibility: hidden;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
-            z-index: 100; border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 92vw; 
-            max-width: 480px; /* 限制寬度避免跑板 */
-        }
-
-        @media (orientation: landscape) {
-            #controls { max-width: 700px; padding: 15px 25px; }
+            z-index: 100; border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 92vw; max-width: 460px;
         }
 
         body.show-ui #controls { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-        body:not(.show-ui) #controls { transform: translate(-50%, 60px); }
+        body:not(.show-ui) #controls { transform: translate(-50%, 100px); }
 
-        .drag-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; flex-shrink: 0; }
-        
-        /* 使用更加彈性的換行佈局 */
-        .control-row { 
-            display: flex; 
-            gap: 12px; 
-            align-items: flex-end; 
-            justify-content: center; 
-            width: 100%; 
-            flex-wrap: wrap; /* 關鍵：寬度不夠時自動換行 */
-        }
+        .drag-handle { width: 32px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+        .control-row { display: flex; gap: 12px; align-items: center; justify-content: center; width: 100%; }
+        .control-group { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; position: relative; }
+        .label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-pair { display: flex; align-items: center; gap: 8px; background: var(--input-bg); padding: 7px 12px; border-radius: 12px; width: 100%; justify-content: center; }
 
-        .control-group { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 5px; 
-            min-width: 80px; /* 確保內容有固定空間 */
-        }
-        
-        .label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; white-space: nowrap; }
-        
-        .desktop-note {
-            font-size: 8px;
-            color: rgba(255,255,255,0.3);
-            margin-top: 4px;
-            white-space: nowrap;
-        }
+        select, input, button { border: none; background: transparent; color: #fff; font-size: 13px; outline: none; width: 100%; font-family: inherit; }
+        option { background: #222; color: #fff; }
 
-        .input-pair { 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            background: var(--input-bg); 
-            padding: 6px 10px; 
-            border-radius: 10px; 
-            justify-content: center;
-        }
-
-        select, input, button { border: none; background: transparent; color: #fff; font-size: 13px; outline: none; }
+        .num-input { width: 38px; text-align: center; font-weight: bold; }
+        .hex-input { width: 68px; text-align: center; font-size: 11px; text-transform: uppercase; }
         
-        /* 針對 Select 特別寬度處理 */
-        select { max-width: 140px; text-overflow: ellipsis; }
-
-        .num-input { width: 32px; text-align: center; font-weight: bold; }
-        .hex-input { width: 62px; text-align: center; font-size: 11px; text-transform: uppercase; }
-        
-        input[type="range"] { width: 60px; accent-color: #fff; }
-        input[type="color"] { width: 22px; height: 22px; border-radius: 50%; padding: 0; border: 1.5px solid rgba(255,255,255,0.2); cursor: pointer; }
+        input[type="range"] { flex: 1; cursor: pointer; accent-color: #fff; }
+        input[type="color"] { width: 22px; height: 22px; border-radius: 50%; padding: 0; border: 1.5px solid rgba(255,255,255,0.2); flex: none; cursor: pointer; }
 
         .btn-icon {
-            background: rgba(255,255,255,0.1); width: 38px; height: 38px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
+            background: rgba(255,255,255,0.1); width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex: none;
         }
-        .btn-icon svg { width: 18px; height: 18px; fill: white; }
+        .btn-icon svg { width: 20px; height: 20px; fill: white; }
+        .desktop-note { font-size: 8px; color: rgba(255,255,255,0.3); position: absolute; bottom: -15px; white-space: nowrap; }
     </style>
 </head>
 <body onclick="handleBodyClick(event)">
@@ -123,7 +82,7 @@
         <div class="drag-handle"></div>
         
         <div class="control-row">
-            <div class="control-group" style="flex: 2;">
+            <div class="control-group">
                 <span class="label">時區選單</span>
                 <div class="input-pair">
                     <select id="timezoneSelect" onclick="event.stopPropagation()">
@@ -141,24 +100,32 @@
                         <option value="Europe/London">倫敦 (London) [GMT+0]</option>
                         <option value="America/New_York">紐約 (New York) [GMT-5]</option>
                         <option value="America/Los_Angeles">洛杉磯 (L.A.) [GMT-8]</option>
+                        <option value="Asia/Dubai">杜拜 (Dubai) [GMT+4]</option>
+                        <option value="Pacific/Auckland">奧克蘭 (Auckland) [GMT+13]</option>
                         <option value="UTC">標準時間 (UTC) [GMT+0]</option>
                     </select>
                 </div>
             </div>
-            <div class="control-group" style="flex: 1;">
-                <span class="label">字體</span>
+        </div>
+
+        <div class="control-row">
+            <div class="control-group" style="flex: 2;">
+                <span class="label">字體選擇</span>
                 <div class="input-pair">
                     <select id="fontFamily" onclick="event.stopPropagation()">
-                        <option value="'JetBrains Mono', monospace">JetBrains</option>
-                        <option value="'Times New Roman', serif">Times New Roman</option>
-                        <option value="'Noto Sans TC', sans-serif">思源黑體</option>
+                        <option value="'JetBrains Mono', monospace">JetBrains Mono (等寬)</option>
+                        <option value="'Times New Roman', Times, serif">Times New Roman (經典)</option>
+                        <option value="'Playfair Display', serif">Playfair Display (優雅)</option>
+                        <option value="'Montserrat', sans-serif">Montserrat (現代)</option>
+                        <option value="'Noto Sans TC', sans-serif">思源黑體 (黑體)</option>
+                        <option value="'Noto Serif TC', serif">思源宋體 (宋體)</option>
                     </select>
                 </div>
             </div>
             <button class="btn-icon" onclick="location.reload();" title="重新整理">
                 <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
             </button>
-            <div class="control-group" style="flex: 0; min-width: 45px;">
+            <div class="control-group" style="flex: none; width: 45px;">
                 <button class="btn-icon" onclick="toggleFullScreen();" title="電腦全螢幕">
                     <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                 </button>
@@ -185,7 +152,7 @@
 
         <div class="control-row">
             <div class="control-group">
-                <span class="label">背景與文字色號</span>
+                <span class="label">背景與文字顏色</span>
                 <div class="input-pair" onclick="event.stopPropagation()">
                     <input type="color" id="bgColorPicker" value="#000000">
                     <input type="text" id="bgHex" class="hex-input" value="#000000" maxlength="7">
@@ -292,7 +259,7 @@
         let touchStartY = 0;
         controls.ontouchstart = (e) => { touchStartY = e.touches[0].clientY; clearTimeout(uiTimer); };
         controls.ontouchend = (e) => {
-            if (e.changedTouches[0].clientY - touchStartY > 30) document.body.classList.remove('show-ui');
+            if (e.changedTouches[0].clientY - touchStartY > 35) document.body.classList.remove('show-ui');
             else resetTimer();
         };
 
