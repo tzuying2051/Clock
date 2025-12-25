@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>專業全螢幕時鐘</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Noto+Sans+TC:wght@700&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 核心時間顯示 */
+        #clock-container {
+            text-align: center;
+            width: 100%;
+        }
+
+        #clock {
+            /* 在大螢幕限制最大值，但在手機上根據寬度縮放 (vw) */
+            font-size: clamp(80px, 25vw, 400px); 
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        #ampm {
+            font-size: 0.2em; /* 相對於時鐘文字縮小 */
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* 控制面板 */
+        #controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(128, 128, 128, 0.2);
+            padding: 12px 24px;
+            border-radius: 40px;
+            display: flex;
+            gap: 20px;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 滑鼠移動或觸摸時顯示控制項 */
+        body:hover #controls, #controls:active {
+            opacity: 1;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .label {
+            font-size: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        select, button, input {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="color"] {
+            width: 40px;
+            height: 30px;
+            padding: 2px;
+        }
+
+        /* 針對手機橫屏優化 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            #clock { font-size: 30vh; }
+            #controls { bottom: 10px; scale: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="clock-container">
+        <div id="clock">00:00:00<span id="ampm"></span></div>
+    </div>
+
+    <div id="controls">
+        <div class="control-group">
+            <span class="label">背景</span>
+            <input type="color" id="bgColorPicker" value="#000000">
+        </div>
+
+        <div class="control-group">
+            <span class="label">小時制</span>
+            <select id="hourFormat">
+                <option value="24">24H</option>
+                <option value="12">12H</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <span class="label">字體</span>
+            <select id="fontFamily">
+                <option value="'JetBrains Mono', monospace">等寬 JetBrains</option>
+                <option value="'Roboto Mono', monospace">現代 Roboto</option>
+                <option value="'Noto Sans TC', sans-serif">黑體 Noto Sans</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <span class="label">螢幕</span>
+            <button onclick="toggleFullScreen()">全螢幕</button>
+        </div>
+    </div>
+
+    <script>
+        let is24Hour = true;
+        const clockElement = document.getElementById('clock');
+        const ampmElement = document.getElementById('ampm');
+        
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            if (!is24Hour) {
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                ampmElement.textContent = ampm;
+            } else {
+                ampmElement.textContent = '';
+            }
