@@ -49,7 +49,7 @@
         }
 
         @media (orientation: landscape) {
-            #controls { max-width: 600px; }
+            #controls { max-width: 650px; }
         }
 
         body.show-ui #controls { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
@@ -62,6 +62,11 @@
         .input-pair { display: flex; align-items: center; gap: 4px; background: var(--input-bg); padding: 4px 8px; border-radius: 8px; width: 100%; justify-content: center; }
 
         select, input, button { border: none; background: transparent; color: #fff; font-size: 12px; outline: none; }
+        
+        /* 時區選單內的群組顏色 */
+        optgroup { background: #222; color: #aaa; }
+        option { background: #222; color: #fff; }
+
         .num-input { width: 30px; text-align: center; font-weight: bold; }
         .hex-input { width: 55px; text-align: center; font-size: 10px; }
         input[type="range"] { width: 100%; max-width: 60px; accent-color: #fff; }
@@ -83,14 +88,45 @@
         
         <div class="control-row">
             <div class="control-group">
-                <span class="label">時區</span>
+                <span class="label">時區選單</span>
                 <select id="timezoneSelect" onclick="event.stopPropagation()">
-                    <option value="local">本地時間</option>
-                    <option value="Asia/Taipei">台北</option>
-                    <option value="Asia/Shanghai">北京</option>
-                    <option value="Asia/Tokyo">東京</option>
-                    <option value="Europe/Paris">巴黎</option>
-                    <option value="Europe/London">倫敦</option>
+                    <option value="local">本地時間 (Local)</option>
+                    <optgroup label="指定城市">
+                        <option value="Asia/Taipei">台北 (Taipei)</option>
+                        <option value="Asia/Shanghai">北京 (Beijing)</option>
+                        <option value="Asia/Hong_Kong">香港 (Hong Kong)</option>
+                        <option value="Asia/Singapore">新加坡 (Singapore)</option>
+                        <option value="Asia/Seoul">韓國 (Seoul)</option>
+                        <option value="Asia/Tokyo">東京 (Tokyo)</option>
+                        <option value="Asia/Bangkok">泰國 (Bangkok)</option>
+                        <option value="Australia/Sydney">雪梨 (Sydney)</option>
+                        <option value="Australia/Melbourne">墨爾本 (Melbourne)</option>
+                        <option value="Europe/Paris">法國 (Paris)</option>
+                        <option value="Europe/London">英國 (London)</option>
+                    </optgroup>
+                    <optgroup label="更多 20+ 地點">
+                        <option value="America/New_York">美國/紐約</option>
+                        <option value="America/Los_Angeles">美國/洛杉磯</option>
+                        <option value="America/Chicago">美國/芝加哥</option>
+                        <option value="America/Toronto">加拿大/多倫多</option>
+                        <option value="America/Vancouver">加拿大/溫哥華</option>
+                        <option value="Europe/Berlin">德國/柏林</option>
+                        <option value="Europe/Rome">義大利/羅馬</option>
+                        <option value="Europe/Madrid">西班牙/馬德里</option>
+                        <option value="Europe/Moscow">俄羅斯/莫斯科</option>
+                        <option value="Asia/Dubai">阿聯酋/杜拜</option>
+                        <option value="Asia/Ho_Chi_Minh">越南/胡志明</option>
+                        <option value="Asia/Jakarta">印尼/雅加達</option>
+                        <option value="Asia/Manila">菲律賓/馬尼拉</option>
+                        <option value="Asia/Kolkata">印度/加爾各答</option>
+                        <option value="Pacific/Auckland">紐西蘭/奧克蘭</option>
+                        <option value="America/Mexico_City">墨西哥城</option>
+                        <option value="America/Sao_Paulo">巴西/聖保羅</option>
+                        <option value="Africa/Cairo">埃及/開羅</option>
+                        <option value="Africa/Johannesburg">南非/約翰尼斯堡</option>
+                        <option value="Europe/Istanbul">土耳其/伊斯坦堡</option>
+                        <option value="UTC">世界標準時間 (UTC)</option>
+                    </optgroup>
                 </select>
             </div>
             <div class="control-group">
@@ -98,7 +134,10 @@
                 <select id="fontFamily" onclick="event.stopPropagation()">
                     <option value="'JetBrains Mono', monospace">JetBrains</option>
                     <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="'Playfair Display', serif">Playfair</option>
+                    <option value="'Montserrat', sans-serif">Montserrat</option>
                     <option value="'Noto Sans TC', sans-serif">思源黑體</option>
+                    <option value="'Noto Serif TC', serif">思源宋體</option>
                 </select>
             </div>
             <button class="btn-icon" onclick="location.reload();" title="重新整理">
@@ -142,7 +181,6 @@
 
     <script>
         let selectedTimezone = "local";
-        let userAdjustedSize = false; // 追蹤使用者是否調整過字體
         let uiTimer;
         const clock = document.getElementById('clock');
         const controls = document.getElementById('controls');
@@ -188,26 +226,21 @@
             }
         }
 
-        function syncSize(val, isUserAction = false) {
-            if (isUserAction) userAdjustedSize = true;
+        function syncSize(val) {
             val = parseFloat(val);
             document.getElementById('sizeSlider').value = val;
             document.getElementById('sizeNum').value = val;
-            
             const isLandscape = window.innerWidth > window.innerHeight;
             clock.style.fontSize = isLandscape ? (val * 1.8) + 'vh' : val + 'vw';
             resetTimer();
         }
 
-        // 當視窗大小改變或旋轉時
         window.addEventListener('resize', () => {
-            const currentSize = document.getElementById('sizeSlider').value;
-            syncSize(currentSize); // 使用當前值重新計算比例，不強制回 18
+            syncSize(document.getElementById('sizeSlider').value);
         });
 
-        document.getElementById('sizeSlider').oninput = (e) => syncSize(e.target.value, true);
-        document.getElementById('sizeNum').onchange = (e) => syncSize(e.target.value, true);
-
+        document.getElementById('sizeSlider').oninput = (e) => syncSize(e.target.value);
+        document.getElementById('sizeNum').onchange = (e) => syncSize(e.target.value);
         document.getElementById('spacingSlider').oninput = (e) => {
             clock.style.letterSpacing = e.target.value + 'px';
             document.getElementById('spacingNum').value = e.target.value;
@@ -218,7 +251,6 @@
             document.getElementById('spacingSlider').value = e.target.value;
             resetTimer();
         };
-
         document.getElementById('bgColorPicker').oninput = (e) => {
             document.documentElement.style.setProperty('--bg-color', e.target.value);
             document.getElementById('bgHex').value = e.target.value.toUpperCase();
@@ -227,6 +259,8 @@
             document.documentElement.style.setProperty('--text-color', e.target.value);
             document.getElementById('textHex').value = e.target.value.toUpperCase();
         };
+        document.getElementById('fontFamily').onchange = (e) => { clock.style.fontFamily = e.target.value; resetTimer(); };
+        document.getElementById('timezoneSelect').onchange = (e) => { selectedTimezone = e.target.value; updateClock(); resetTimer(); };
 
         let touchStartY = 0;
         controls.ontouchstart = (e) => { touchStartY = e.touches[0].clientY; clearTimeout(uiTimer); };
@@ -237,8 +271,6 @@
 
         setInterval(updateClock, 1000);
         updateClock();
-        
-        // 只有初始加載時設定為 18
         syncSize(18);
     </script>
 </body>
