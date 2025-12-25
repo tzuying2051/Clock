@@ -45,7 +45,7 @@
             opacity: 0; visibility: hidden;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
             z-index: 100; border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 90vw; max-width: 400px;
+            width: 90vw; max-width: 420px;
         }
 
         @media (orientation: landscape) {
@@ -57,14 +57,21 @@
 
         .drag-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
         .control-row { display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%; flex-wrap: wrap; }
-        .control-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+        .control-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; position: relative; }
         .label { font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+        
+        .desktop-note {
+            font-size: 8px;
+            color: rgba(255,255,255,0.3);
+            position: absolute;
+            bottom: -14px;
+            white-space: nowrap;
+        }
+
         .input-pair { display: flex; align-items: center; gap: 4px; background: var(--input-bg); padding: 4px 8px; border-radius: 8px; width: 100%; justify-content: center; }
 
         select, input, button { border: none; background: transparent; color: #fff; font-size: 12px; outline: none; }
         
-        /* 時區選單內的群組顏色 */
-        optgroup { background: #222; color: #aaa; }
         option { background: #222; color: #fff; }
 
         .num-input { width: 30px; text-align: center; font-weight: bold; }
@@ -91,42 +98,38 @@
                 <span class="label">時區選單</span>
                 <select id="timezoneSelect" onclick="event.stopPropagation()">
                     <option value="local">本地時間 (Local)</option>
-                    <optgroup label="指定城市">
-                        <option value="Asia/Taipei">台北 (Taipei)</option>
-                        <option value="Asia/Shanghai">北京 (Beijing)</option>
-                        <option value="Asia/Hong_Kong">香港 (Hong Kong)</option>
-                        <option value="Asia/Singapore">新加坡 (Singapore)</option>
-                        <option value="Asia/Seoul">韓國 (Seoul)</option>
-                        <option value="Asia/Tokyo">東京 (Tokyo)</option>
-                        <option value="Asia/Bangkok">泰國 (Bangkok)</option>
-                        <option value="Australia/Sydney">雪梨 (Sydney)</option>
-                        <option value="Australia/Melbourne">墨爾本 (Melbourne)</option>
-                        <option value="Europe/Paris">法國 (Paris)</option>
-                        <option value="Europe/London">英國 (London)</option>
-                    </optgroup>
-                    <optgroup label="更多 20+ 地點">
-                        <option value="America/New_York">美國/紐約</option>
-                        <option value="America/Los_Angeles">美國/洛杉磯</option>
-                        <option value="America/Chicago">美國/芝加哥</option>
-                        <option value="America/Toronto">加拿大/多倫多</option>
-                        <option value="America/Vancouver">加拿大/溫哥華</option>
-                        <option value="Europe/Berlin">德國/柏林</option>
-                        <option value="Europe/Rome">義大利/羅馬</option>
-                        <option value="Europe/Madrid">西班牙/馬德里</option>
-                        <option value="Europe/Moscow">俄羅斯/莫斯科</option>
-                        <option value="Asia/Dubai">阿聯酋/杜拜</option>
-                        <option value="Asia/Ho_Chi_Minh">越南/胡志明</option>
-                        <option value="Asia/Jakarta">印尼/雅加達</option>
-                        <option value="Asia/Manila">菲律賓/馬尼拉</option>
-                        <option value="Asia/Kolkata">印度/加爾各答</option>
-                        <option value="Pacific/Auckland">紐西蘭/奧克蘭</option>
-                        <option value="America/Mexico_City">墨西哥城</option>
-                        <option value="America/Sao_Paulo">巴西/聖保羅</option>
-                        <option value="Africa/Cairo">埃及/開羅</option>
-                        <option value="Africa/Johannesburg">南非/約翰尼斯堡</option>
-                        <option value="Europe/Istanbul">土耳其/伊斯坦堡</option>
-                        <option value="UTC">世界標準時間 (UTC)</option>
-                    </optgroup>
+                    <option value="Asia/Taipei">台北 (Taipei)</option>
+                    <option value="Asia/Shanghai">北京 (Beijing)</option>
+                    <option value="Asia/Hong_Kong">香港 (Hong Kong)</option>
+                    <option value="Asia/Singapore">新加坡 (Singapore)</option>
+                    <option value="Asia/Seoul">韓國 (Seoul)</option>
+                    <option value="Asia/Tokyo">東京 (Tokyo)</option>
+                    <option value="Asia/Bangkok">曼谷 (Bangkok)</option>
+                    <option value="Australia/Sydney">雪梨 (Sydney)</option>
+                    <option value="Australia/Melbourne">墨爾本 (Melbourne)</option>
+                    <option value="Europe/Paris">巴黎 (Paris)</option>
+                    <option value="Europe/London">倫敦 (London)</option>
+                    <option value="America/New_York">紐約 (New York)</option>
+                    <option value="America/Los_Angeles">洛杉磯 (L.A.)</option>
+                    <option value="America/Chicago">芝加哥 (Chicago)</option>
+                    <option value="America/Toronto">多倫多 (Toronto)</option>
+                    <option value="America/Vancouver">溫哥華 (Vancouver)</option>
+                    <option value="Europe/Berlin">柏林 (Berlin)</option>
+                    <option value="Europe/Rome">羅馬 (Rome)</option>
+                    <option value="Europe/Madrid">馬德里 (Madrid)</option>
+                    <option value="Europe/Moscow">莫斯科 (Moscow)</option>
+                    <option value="Asia/Dubai">杜拜 (Dubai)</option>
+                    <option value="Asia/Ho_Chi_Minh">胡志明 (Saigon)</option>
+                    <option value="Asia/Jakarta">雅加達 (Jakarta)</option>
+                    <option value="Asia/Manila">馬尼拉 (Manila)</option>
+                    <option value="Asia/Kolkata">加爾各答 (Kolkata)</option>
+                    <option value="Pacific/Auckland">奧克蘭 (Auckland)</option>
+                    <option value="America/Mexico_City">墨西哥城</option>
+                    <option value="America/Sao_Paulo">聖保羅</option>
+                    <option value="Africa/Cairo">開羅</option>
+                    <option value="Africa/Johannesburg">約翰尼斯堡</option>
+                    <option value="Europe/Istanbul">伊斯坦堡</option>
+                    <option value="UTC">世界標準時間 (UTC)</option>
                 </select>
             </div>
             <div class="control-group">
@@ -140,12 +143,17 @@
                     <option value="'Noto Serif TC', serif">思源宋體</option>
                 </select>
             </div>
+            
             <button class="btn-icon" onclick="location.reload();" title="重新整理">
                 <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
             </button>
-            <button class="btn-icon" onclick="toggleFullScreen();" title="全螢幕">
-                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            </button>
+
+            <div class="control-group" style="flex: 0; min-width: 40px;">
+                <button class="btn-icon" onclick="toggleFullScreen();" title="電腦全螢幕">
+                    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+                <span class="desktop-note">僅限電腦</span>
+            </div>
         </div>
 
         <div class="control-row">
@@ -258,6 +266,18 @@
         document.getElementById('textColorPicker').oninput = (e) => {
             document.documentElement.style.setProperty('--text-color', e.target.value);
             document.getElementById('textHex').value = e.target.value.toUpperCase();
+        };
+        document.getElementById('bgHex').onchange = (e) => {
+            let val = e.target.value;
+            if(!val.startsWith('#')) val = '#' + val;
+            document.documentElement.style.setProperty('--bg-color', val);
+            document.getElementById('bgColorPicker').value = val;
+        };
+        document.getElementById('textHex').onchange = (e) => {
+            let val = e.target.value;
+            if(!val.startsWith('#')) val = '#' + val;
+            document.documentElement.style.setProperty('--text-color', val);
+            document.getElementById('textColorPicker').value = val;
         };
         document.getElementById('fontFamily').onchange = (e) => { clock.style.fontFamily = e.target.value; resetTimer(); };
         document.getElementById('timezoneSelect').onchange = (e) => { selectedTimezone = e.target.value; updateClock(); resetTimer(); };
