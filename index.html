@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>最好用的時鐘</title>
+    <title>傳說中最好用的時鐘</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,115 +26,113 @@
             font-size: 28vw; font-weight: 700; font-variant-numeric: tabular-nums;
             line-height: 1; white-space: nowrap; user-select: none; z-index: 1;
             font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0px;
         }
-        #ampm { font-size: 0.25em; margin-left: 10px; vertical-align: middle; }
 
+        /* 控制面板 */
         #controls {
-            position: fixed; bottom: 30px; left: 50%;
+            position: fixed; bottom: 20px; left: 50%;
             transform: translate(-50%, 0);
-            background: rgba(30, 30, 30, 0.95);
-            padding: 15px 25px; border-radius: 30px;
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            background: rgba(25, 25, 25, 0.96);
+            padding: 15px 20px; border-radius: 25px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
             backdrop-filter: blur(25px); opacity: 0; visibility: hidden;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
-            z-index: 100; border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.7); touch-action: none;
-            width: 90vw; max-width: 800px;
+            z-index: 100; border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 95vw; max-width: 900px;
         }
-        .drag-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; }
-        .control-row { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; }
+        .drag-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-bottom: 5px; }
+        .control-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; }
         body.show-ui #controls { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
         body:not(.show-ui) #controls { transform: translate(-50%, 110%); }
 
         .control-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+        .label { font-size: 10px; color: #888; text-transform: uppercase; }
+
+        .input-pair { display: flex; align-items: center; gap: 5px; background: #000; padding: 2px 6px; border-radius: 6px; }
 
         select, button, input {
-            padding: 6px 8px; border-radius: 8px; border: none;
-            background: #000; color: #fff; font-size: 12px; outline: none;
+            border: none; background: #000; color: #fff; font-size: 12px; outline: none;
         }
-        input[type="range"] { width: 70px; accent-color: #fff; }
-        input[type="color"] { width: 30px; height: 25px; padding: 0; border: 1px solid #444; }
+        
+        /* 數值輸入框樣式 */
+        .num-input { width: 35px; text-align: center; border-bottom: 1px solid #444; padding: 2px 0; }
+        .hex-input { width: 65px; text-align: center; text-transform: uppercase; font-family: monospace; }
+        
+        input[type="range"] { width: 60px; accent-color: #fff; }
+        input[type="color"] { width: 24px; height: 24px; padding: 0; cursor: pointer; background: none; }
 
         @media (orientation: landscape) { #clock { font-size: 45vh; } }
     </style>
 </head>
 <body onclick="handleBodyClick(event)">
 
-    <div id="clock">00:00:00<span id="ampm"></span></div>
+    <div id="clock">00:00:00</div>
 
     <div id="controls">
         <div class="drag-handle"></div>
         
         <div class="control-row">
             <div class="control-group">
-                <span class="label">全球時區</span>
+                <span class="label">時區</span>
                 <select id="timezoneSelect" onclick="event.stopPropagation()">
-                    <optgroup label="常用">
-                        <option value="local">本地時間</option>
-                        <option value="Asia/Taipei">台灣/台北</option>
-                        <option value="Asia/Shanghai">北京時間</option>
-                        <option value="Asia/Hong_Kong">香港時間</option>
-                        <option value="Asia/Singapore">新加坡</option>
-                        <option value="Asia/Seoul">韓國/首爾</option>
-                        <option value="Asia/Tokyo">日本/東京</option>
-                        <option value="Asia/Bangkok">泰國/曼谷</option>
-                        <option value="Australia/Sydney">澳洲/雪梨</option>
-                        <option value="Australia/Melbourne">澳洲/墨爾本</option>
-                        <option value="Europe/London">英國/倫敦</option>
-                        <option value="Europe/Paris">法國/巴黎</option>
-                    </optgroup>
-                    <optgroup label="更多時區">
-                        <option value="America/New_York">美國/紐約</option>
-                        <option value="America/Los_Angeles">美國/洛杉磯</option>
-                        <option value="America/Chicago">美國/芝加哥</option>
-                        <option value="Europe/Berlin">德國/柏林</option>
-                        <option value="Europe/Rome">義大利/羅馬</option>
-                        <option value="Asia/Dubai">阿聯酋/杜拜</option>
-                        <option value="Pacific/Auckland">紐西蘭/奧克蘭</option>
-                    </optgroup>
+                    <option value="local">本地時間</option>
+                    <option value="Asia/Taipei">台北 (GMT+8)</option>
+                    <option value="Asia/Shanghai">北京 (GMT+8)</option>
+                    <option value="Asia/Tokyo">東京 (GMT+9)</option>
+                    <option value="America/New_York">紐約 (GMT-5)</option>
+                    <option value="Europe/London">倫敦 (GMT+0)</option>
+                    <option value="Europe/Paris">巴黎 (GMT+1)</option>
                 </select>
             </div>
             <div class="control-group">
-                <span class="label">字體選擇</span>
+                <span class="label">字體</span>
                 <select id="fontFamily" onclick="event.stopPropagation()">
-                    <option value="'JetBrains Mono', monospace">等寬 JetBrains</option>
+                    <option value="'JetBrains Mono', monospace">JetBrains</option>
                     <option value="'Times New Roman', serif">Times New Roman</option>
-                    <option value="'Playfair Display', serif">Playfair (優雅)</option>
-                    <option value="'Montserrat', sans-serif">Montserrat (現代)</option>
+                    <option value="'Playfair Display', serif">Playfair</option>
+                    <option value="'Montserrat', sans-serif">Montserrat</option>
                     <option value="'Noto Sans TC', sans-serif">思源黑體</option>
-                    <option value="'Noto Serif TC', serif">思源宋體</option>
                 </select>
+            </div>
+            <div class="control-group">
+                <span class="label">操作</span>
+                <button onclick="location.reload();">重整頁面</button>
             </div>
         </div>
 
         <div class="control-row">
             <div class="control-group">
                 <span class="label">字體大小</span>
-                <input type="range" id="sizeSlider" min="10" max="65" value="28" onclick="event.stopPropagation()">
+                <div class="input-pair" onclick="event.stopPropagation()">
+                    <input type="range" id="sizeSlider" min="5" max="80" value="28">
+                    <input type="number" id="sizeNum" class="num-input" value="28">
+                </div>
             </div>
             <div class="control-group">
                 <span class="label">字體間距</span>
-                <input type="range" id="spacingSlider" min="-10" max="50" value="0" onclick="event.stopPropagation()">
+                <div class="input-pair" onclick="event.stopPropagation()">
+                    <input type="range" id="spacingSlider" min="-10" max="100" value="0">
+                    <input type="number" id="spacingNum" class="num-input" value="0">
+                </div>
             </div>
             <div class="control-group">
-                <span class="label">背景</span>
-                <input type="color" id="bgColorPicker" value="#000000" onclick="event.stopPropagation()">
+                <span class="label">背景色</span>
+                <div class="input-pair" onclick="event.stopPropagation()">
+                    <input type="color" id="bgColorPicker" value="#000000">
+                    <input type="text" id="bgHex" class="hex-input" value="#000000" maxlength="7">
+                </div>
             </div>
             <div class="control-group">
-                <span class="label">文字顏色</span>
-                <input type="color" id="textColorPicker" value="#ffffff" onclick="event.stopPropagation()">
-            </div>
-            <div class="control-group">
-                <span class="label">操作</span>
-                <button onclick="location.reload();">重整</button>
+                <span class="label">文字色</span>
+                <div class="input-pair" onclick="event.stopPropagation()">
+                    <input type="color" id="textColorPicker" value="#FFFFFF">
+                    <input type="text" id="textHex" class="hex-input" value="#FFFFFF" maxlength="7">
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let is24Hour = true;
         let selectedTimezone = "local";
         let uiTimer;
         const clock = document.getElementById('clock');
@@ -146,7 +144,7 @@
             if (selectedTimezone !== "local") options.timeZone = selectedTimezone;
             try {
                 let timeParts = now.toLocaleTimeString('en-GB', options).split(':');
-                clock.childNodes[0].nodeValue = `${timeParts[0].padStart(2, '0')}:${timeParts[1]}:${timeParts[2]}`;
+                clock.textContent = `${timeParts[0].padStart(2, '0')}:${timeParts[1]}:${timeParts[2]}`;
             } catch(e) { console.error(e); }
         }
 
@@ -158,47 +156,73 @@
 
         function resetTimer() {
             clearTimeout(uiTimer);
-            uiTimer = setTimeout(() => document.body.classList.remove('show-ui'), 5000);
+            uiTimer = setTimeout(() => {
+                // 如果目前的焦點不在輸入框內，才自動隱藏
+                if (!document.activeElement.tagName.match(/INPUT|SELECT/)) {
+                    document.body.classList.remove('show-ui');
+                } else {
+                    resetTimer(); // 如果在輸入，重新計時
+                }
+            }, 6000);
         }
 
-        document.getElementById('sizeSlider').oninput = (e) => {
-            const size = e.target.value;
-            clock.style.fontSize = (window.innerHeight < window.innerWidth) ? (size * 1.5) + 'vh' : size + 'vw';
+        // --- 同步邏輯控制函數 ---
+        function syncSize(val) {
+            document.getElementById('sizeSlider').value = val;
+            document.getElementById('sizeNum').value = val;
+            clock.style.fontSize = (window.innerHeight < window.innerWidth) ? (val * 1.5) + 'vh' : val + 'vw';
             resetTimer();
+        }
+
+        function syncSpacing(val) {
+            document.getElementById('spacingSlider').value = val;
+            document.getElementById('spacingNum').value = val;
+            clock.style.letterSpacing = val + 'px';
+            resetTimer();
+        }
+
+        function syncBG(hex) {
+            document.getElementById('bgColorPicker').value = hex;
+            document.getElementById('bgHex').value = hex.toUpperCase();
+            document.documentElement.style.setProperty('--bg-color', hex);
+            resetTimer();
+        }
+
+        function syncText(hex) {
+            document.getElementById('textColorPicker').value = hex;
+            document.getElementById('textHex').value = hex.toUpperCase();
+            document.documentElement.style.setProperty('--text-color', hex);
+            resetTimer();
+        }
+
+        // --- 事件綁定 ---
+        document.getElementById('sizeSlider').oninput = (e) => syncSize(e.target.value);
+        document.getElementById('sizeNum').onchange = (e) => syncSize(e.target.value);
+
+        document.getElementById('spacingSlider').oninput = (e) => syncSpacing(e.target.value);
+        document.getElementById('spacingNum').onchange = (e) => syncSpacing(e.target.value);
+
+        document.getElementById('bgColorPicker').oninput = (e) => syncBG(e.target.value);
+        document.getElementById('bgHex').onchange = (e) => {
+            let val = e.target.value;
+            if(/^#[0-9A-F]{6}$/i.test(val)) syncBG(val);
         };
 
-        document.getElementById('spacingSlider').oninput = (e) => {
-            clock.style.letterSpacing = e.target.value + 'px';
-            resetTimer();
+        document.getElementById('textColorPicker').oninput = (e) => syncText(e.target.value);
+        document.getElementById('textHex').onchange = (e) => {
+            let val = e.target.value;
+            if(/^#[0-9A-F]{6}$/i.test(val)) syncText(val);
         };
 
-        document.getElementById('fontFamily').onchange = (e) => {
-            clock.style.fontFamily = e.target.value;
-            resetTimer();
-        };
+        document.getElementById('fontFamily').onchange = (e) => { clock.style.fontFamily = e.target.value; resetTimer(); };
+        document.getElementById('timezoneSelect').onchange = (e) => { selectedTimezone = e.target.value; updateClock(); resetTimer(); };
 
-        document.getElementById('timezoneSelect').onchange = (e) => {
-            selectedTimezone = e.target.value;
-            updateClock();
-            resetTimer();
-        };
-
-        document.getElementById('bgColorPicker').oninput = (e) => {
-            document.documentElement.style.setProperty('--bg-color', e.target.value);
-            resetTimer();
-        };
-
-        document.getElementById('textColorPicker').oninput = (e) => {
-            document.documentElement.style.setProperty('--text-color', e.target.value);
-            resetTimer();
-        };
-
+        // 滑動隱藏
         let touchStartY = 0;
         controls.ontouchstart = (e) => { touchStartY = e.touches[0].clientY; clearTimeout(uiTimer); };
         controls.ontouchend = (e) => {
-            if (e.changedTouches[0].clientY - touchStartY > 30) {
-                document.body.classList.remove('show-ui');
-            } else { resetTimer(); }
+            if (e.changedTouches[0].clientY - touchStartY > 35) document.body.classList.remove('show-ui');
+            else resetTimer();
         };
 
         setInterval(updateClock, 1000);
