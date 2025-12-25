@@ -15,78 +15,82 @@
         :root { 
             --bg-color: #000000; 
             --text-color: #ffffff;
-            --panel-bg: rgba(20, 20, 20, 0.85);
-            --input-bg: rgba(0, 0, 0, 0.6);
+            --panel-bg: rgba(28, 28, 28, 0.9);
+            --input-bg: rgba(255, 255, 255, 0.1);
             --accent: #ffffff;
         }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
             background-color: var(--bg-color); color: var(--text-color);
-            transition: background-color 0.4s, color 0.4s;
+            transition: background-color 0.4s;
             display: flex; justify-content: center; align-items: center;
             font-family: 'JetBrains Mono', sans-serif;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         #clock {
-            font-size: 18vw; 
+            font-size: 25vw; /* 豎屏預設較大 */
             font-weight: 700;
             font-variant-numeric: tabular-nums;
             line-height: 1;
             white-space: nowrap;
             user-select: none;
-            transition: font-size 0.2s;
+            transition: font-size 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* 控制面板 - 豎屏優化 */
         #controls {
-            position: fixed; bottom: 25px; left: 50%;
+            position: fixed; bottom: 30px; left: 50%;
             transform: translate(-50%, 0);
             background: var(--panel-bg);
-            padding: 12px 20px; border-radius: 20px;
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 16px; border-radius: 24px;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             opacity: 0; visibility: hidden;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
-            z-index: 100; border: 0.5px solid rgba(255, 255, 255, 0.1);
-            width: fit-content; max-width: 95vw;
+            z-index: 100; border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 85vw; max-width: 350px; /* 豎屏窄版 */
+        }
+
+        /* 橫屏或全螢幕時的面板調整 */
+        @media (orientation: landscape) {
+            #controls { 
+                width: auto; max-width: 90vw; 
+                flex-direction: column; /* 保持兩排結構 */
+            }
+            #clock { font-size: 45vh; }
         }
 
         body.show-ui #controls { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
         body:not(.show-ui) #controls { transform: translate(-50%, 40px); }
 
-        .drag-handle { width: 32px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-bottom: 4px; }
-        .control-row { display: flex; gap: 16px; align-items: center; justify-content: center; }
+        .drag-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-bottom: 4px; }
+        .control-row { display: flex; gap: 12px; align-items: flex-end; justify-content: center; width: 100%; flex-wrap: wrap; }
 
-        .control-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .label { font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; }
+        .control-group { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; min-width: 60px; }
+        .label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .input-pair { display: flex; align-items: center; gap: 6px; background: var(--input-bg); padding: 4px 8px; border-radius: 8px; }
+        .input-pair { display: flex; align-items: center; gap: 5px; background: var(--input-bg); padding: 5px 8px; border-radius: 10px; width: 100%; justify-content: center; }
 
-        select, input, button {
-            border: none; background: transparent; color: #fff; font-size: 12px; outline: none; font-family: inherit;
-        }
-
-        optgroup { background: #1a1a1a; color: #888; font-style: normal; }
-
-        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-        .num-input { width: 30px; text-align: center; color: var(--accent); }
-        .hex-input { width: 60px; text-align: center; font-size: 10px; opacity: 0.8; }
+        select, input, button { border: none; background: transparent; color: #fff; font-size: 13px; outline: none; font-family: inherit; }
         
-        input[type="range"] { width: 50px; cursor: pointer; accent-color: var(--accent); }
-        input[type="color"] { width: 18px; height: 18px; border-radius: 50%; overflow: hidden; cursor: pointer; border: none; padding: 0; }
+        .num-input { width: 32px; text-align: center; font-weight: bold; }
+        .hex-input { width: 60px; text-align: center; font-size: 11px; }
+        
+        input[type="range"] { width: 100%; max-width: 80px; cursor: pointer; accent-color: var(--accent); }
+        input[type="color"] { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); padding: 0; }
 
-        .btn-reload {
+        /* 按鈕組 */
+        .btn-icon {
             background: rgba(255,255,255,0.1);
-            padding: 8px; border-radius: 50%;
+            width: 36px; height: 36px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
-        .btn-reload:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
-        .btn-reload svg { width: 16px; height: 16px; fill: white; }
+        .btn-icon:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
+        .btn-icon svg { width: 18px; height: 18px; fill: white; }
 
-        @media (orientation: landscape) { #clock { font-size: 35vh; } }
     </style>
 </head>
 <body onclick="handleBodyClick(event)">
@@ -104,37 +108,9 @@
                     <optgroup label="指定城市">
                         <option value="Asia/Taipei">台北</option>
                         <option value="Asia/Shanghai">北京</option>
-                        <option value="Asia/Hong_Kong">香港</option>
-                        <option value="Asia/Singapore">新加坡</option>
-                        <option value="Asia/Seoul">首爾</option>
                         <option value="Asia/Tokyo">東京</option>
-                        <option value="Asia/Bangkok">曼谷</option>
-                        <option value="Australia/Sydney">雪梨</option>
-                        <option value="Australia/Melbourne">墨爾本</option>
                         <option value="Europe/Paris">巴黎</option>
                         <option value="Europe/London">倫敦</option>
-                    </optgroup>
-                    <optgroup label="全球主要城市">
-                        <option value="America/New_York">紐約</option>
-                        <option value="America/Los_Angeles">洛杉磯</option>
-                        <option value="America/Chicago">芝加哥</option>
-                        <option value="America/Toronto">多倫多</option>
-                        <option value="America/Vancouver">溫哥華</option>
-                        <option value="Europe/Berlin">柏林</option>
-                        <option value="Europe/Rome">羅馬</option>
-                        <option value="Europe/Madrid">馬德里</option>
-                        <option value="Europe/Moscow">莫斯科</option>
-                        <option value="Asia/Dubai">杜拜</option>
-                        <option value="Asia/Kolkata">加爾各答</option>
-                        <option value="Pacific/Auckland">奧克蘭</option>
-                        <option value="America/Mexico_City">墨西哥城</option>
-                        <option value="America/Sao_Paulo">聖保羅</option>
-                        <option value="Asia/Jakarta">雅加達</option>
-                        <option value="Asia/Ho_Chi_Minh">胡志明</option>
-                        <option value="Asia/Manila">馬尼拉</option>
-                        <option value="Africa/Cairo">開羅</option>
-                        <option value="Africa/Johannesburg">約翰尼斯堡</option>
-                        <option value="Europe/Istanbul">伊斯坦堡</option>
                     </optgroup>
                 </select>
             </div>
@@ -147,10 +123,14 @@
                     <option value="'Noto Sans TC', sans-serif">思源黑體</option>
                 </select>
             </div>
-            <div class="control-group">
-                <span class="label"></span>
-                <button class="btn-reload" onclick="location.reload();" title="重新整理">
+            <div class="control-group" style="flex: 0;">
+                <button class="btn-icon" onclick="location.reload();" title="重新整理">
                     <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                </button>
+            </div>
+            <div class="control-group" style="flex: 0;">
+                <button class="btn-icon" onclick="toggleFullScreen();" title="全螢幕">
+                    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                 </button>
             </div>
         </div>
@@ -159,8 +139,8 @@
             <div class="control-group">
                 <span class="label">大小</span>
                 <div class="input-pair" onclick="event.stopPropagation()">
-                    <input type="range" id="sizeSlider" min="5" max="80" value="18">
-                    <input type="number" id="sizeNum" class="num-input" value="18">
+                    <input type="range" id="sizeSlider" min="5" max="85" value="25">
+                    <input type="number" id="sizeNum" class="num-input" value="25">
                 </div>
             </div>
             <div class="control-group">
@@ -170,12 +150,15 @@
                     <input type="number" id="spacingNum" class="num-input" value="0">
                 </div>
             </div>
+        </div>
+
+        <div class="control-row">
             <div class="control-group">
-                <span class="label">背景 / 文字色</span>
+                <span class="label">背景與文字色號</span>
                 <div class="input-pair" onclick="event.stopPropagation()">
                     <input type="color" id="bgColorPicker" value="#000000">
                     <input type="text" id="bgHex" class="hex-input" value="#000000" maxlength="7">
-                    <span style="color:rgba(255,255,255,0.2)">|</span>
+                    <span style="opacity: 0.2">|</span>
                     <input type="color" id="textColorPicker" value="#FFFFFF">
                     <input type="text" id="textHex" class="hex-input" value="#FFFFFF" maxlength="7">
                 </div>
@@ -214,8 +197,19 @@
             }, 5000);
         }
 
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`無法全螢幕: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+            resetTimer();
+        }
+
         function syncSize(val) {
-            val = parseFloat(val) || 18;
+            val = parseFloat(val) || 25;
             document.getElementById('sizeSlider').value = val;
             document.getElementById('sizeNum').value = val;
             clock.style.fontSize = (window.innerHeight < window.innerWidth) ? (val * 1.5) + 'vh' : val + 'vw';
@@ -257,6 +251,7 @@
         document.getElementById('fontFamily').onchange = (e) => { clock.style.fontFamily = e.target.value; resetTimer(); };
         document.getElementById('timezoneSelect').onchange = (e) => { selectedTimezone = e.target.value; updateClock(); resetTimer(); };
 
+        // 下滑隱藏
         let touchStartY = 0;
         controls.ontouchstart = (e) => { touchStartY = e.touches[0].clientY; clearTimeout(uiTimer); };
         controls.ontouchend = (e) => {
@@ -266,7 +261,7 @@
 
         setInterval(updateClock, 1000);
         updateClock();
-        syncSize(18);
+        syncSize(25); // 豎屏預設初始值
     </script>
 </body>
 </html>
