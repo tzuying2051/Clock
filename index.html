@@ -3,65 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>傳說中最好用的時鐘</title>
+    <title>最好用的時鐘</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="最好用的時鐘">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
 
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=JetBrains+Mono:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        :root { --bg-color: #000000; --text-color: #ffffff; }
+        :root { 
+            --bg-color: #000000; 
+            --text-color: #ffffff;
+            --panel-bg: rgba(20, 20, 20, 0.85);
+            --input-bg: rgba(0, 0, 0, 0.6);
+            --accent: #ffffff;
+        }
+
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
             background-color: var(--bg-color); color: var(--text-color);
             transition: background-color 0.4s, color 0.4s;
             display: flex; justify-content: center; align-items: center;
+            font-family: 'JetBrains Mono', sans-serif;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
+
         #clock {
-            font-size: 28vw; font-weight: 700; font-variant-numeric: tabular-nums;
-            line-height: 1; white-space: nowrap; user-select: none; z-index: 1;
-            font-family: 'JetBrains Mono', monospace;
+            font-size: 18vw; 
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            white-space: nowrap;
+            user-select: none;
+            transition: font-size 0.2s;
         }
 
-        /* 控制面板 */
         #controls {
-            position: fixed; bottom: 20px; left: 50%;
+            position: fixed; bottom: 25px; left: 50%;
             transform: translate(-50%, 0);
-            background: rgba(25, 25, 25, 0.96);
-            padding: 15px 20px; border-radius: 25px;
+            background: var(--panel-bg);
+            padding: 12px 20px; border-radius: 20px;
             display: flex; flex-direction: column; align-items: center; gap: 10px;
-            backdrop-filter: blur(25px); opacity: 0; visibility: hidden;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
-            z-index: 100; border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 95vw; max-width: 900px;
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            opacity: 0; visibility: hidden;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+            z-index: 100; border: 0.5px solid rgba(255, 255, 255, 0.1);
+            width: fit-content; max-width: 95vw;
         }
-        .drag-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin-bottom: 5px; }
-        .control-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; }
+
         body.show-ui #controls { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-        body:not(.show-ui) #controls { transform: translate(-50%, 110%); }
+        body:not(.show-ui) #controls { transform: translate(-50%, 40px); }
+
+        .drag-handle { width: 32px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; margin-bottom: 4px; }
+        .control-row { display: flex; gap: 16px; align-items: center; justify-content: center; }
 
         .control-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .label { font-size: 10px; color: #888; text-transform: uppercase; }
+        .label { font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .input-pair { display: flex; align-items: center; gap: 5px; background: #000; padding: 2px 6px; border-radius: 6px; }
+        .input-pair { display: flex; align-items: center; gap: 6px; background: var(--input-bg); padding: 4px 8px; border-radius: 8px; }
 
-        select, button, input {
-            border: none; background: #000; color: #fff; font-size: 12px; outline: none;
+        select, input, button {
+            border: none; background: transparent; color: #fff; font-size: 12px; outline: none; font-family: inherit;
         }
-        
-        /* 數值輸入框樣式 */
-        .num-input { width: 35px; text-align: center; border-bottom: 1px solid #444; padding: 2px 0; }
-        .hex-input { width: 65px; text-align: center; text-transform: uppercase; font-family: monospace; }
-        
-        input[type="range"] { width: 60px; accent-color: #fff; }
-        input[type="color"] { width: 24px; height: 24px; padding: 0; cursor: pointer; background: none; }
 
-        @media (orientation: landscape) { #clock { font-size: 45vh; } }
+        optgroup { background: #1a1a1a; color: #888; font-style: normal; }
+
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .num-input { width: 30px; text-align: center; color: var(--accent); }
+        .hex-input { width: 60px; text-align: center; font-size: 10px; opacity: 0.8; }
+        
+        input[type="range"] { width: 50px; cursor: pointer; accent-color: var(--accent); }
+        input[type="color"] { width: 18px; height: 18px; border-radius: 50%; overflow: hidden; cursor: pointer; border: none; padding: 0; }
+
+        .btn-reload {
+            background: rgba(255,255,255,0.1);
+            padding: 8px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .btn-reload:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
+        .btn-reload svg { width: 16px; height: 16px; fill: white; }
+
+        @media (orientation: landscape) { #clock { font-size: 35vh; } }
     </style>
 </head>
 <body onclick="handleBodyClick(event)">
@@ -76,12 +101,41 @@
                 <span class="label">時區</span>
                 <select id="timezoneSelect" onclick="event.stopPropagation()">
                     <option value="local">本地時間</option>
-                    <option value="Asia/Taipei">台北 (GMT+8)</option>
-                    <option value="Asia/Shanghai">北京 (GMT+8)</option>
-                    <option value="Asia/Tokyo">東京 (GMT+9)</option>
-                    <option value="America/New_York">紐約 (GMT-5)</option>
-                    <option value="Europe/London">倫敦 (GMT+0)</option>
-                    <option value="Europe/Paris">巴黎 (GMT+1)</option>
+                    <optgroup label="指定城市">
+                        <option value="Asia/Taipei">台北</option>
+                        <option value="Asia/Shanghai">北京</option>
+                        <option value="Asia/Hong_Kong">香港</option>
+                        <option value="Asia/Singapore">新加坡</option>
+                        <option value="Asia/Seoul">首爾</option>
+                        <option value="Asia/Tokyo">東京</option>
+                        <option value="Asia/Bangkok">曼谷</option>
+                        <option value="Australia/Sydney">雪梨</option>
+                        <option value="Australia/Melbourne">墨爾本</option>
+                        <option value="Europe/Paris">巴黎</option>
+                        <option value="Europe/London">倫敦</option>
+                    </optgroup>
+                    <optgroup label="全球主要城市">
+                        <option value="America/New_York">紐約</option>
+                        <option value="America/Los_Angeles">洛杉磯</option>
+                        <option value="America/Chicago">芝加哥</option>
+                        <option value="America/Toronto">多倫多</option>
+                        <option value="America/Vancouver">溫哥華</option>
+                        <option value="Europe/Berlin">柏林</option>
+                        <option value="Europe/Rome">羅馬</option>
+                        <option value="Europe/Madrid">馬德里</option>
+                        <option value="Europe/Moscow">莫斯科</option>
+                        <option value="Asia/Dubai">杜拜</option>
+                        <option value="Asia/Kolkata">加爾各答</option>
+                        <option value="Pacific/Auckland">奧克蘭</option>
+                        <option value="America/Mexico_City">墨西哥城</option>
+                        <option value="America/Sao_Paulo">聖保羅</option>
+                        <option value="Asia/Jakarta">雅加達</option>
+                        <option value="Asia/Ho_Chi_Minh">胡志明</option>
+                        <option value="Asia/Manila">馬尼拉</option>
+                        <option value="Africa/Cairo">開羅</option>
+                        <option value="Africa/Johannesburg">約翰尼斯堡</option>
+                        <option value="Europe/Istanbul">伊斯坦堡</option>
+                    </optgroup>
                 </select>
             </div>
             <div class="control-group">
@@ -90,41 +144,38 @@
                     <option value="'JetBrains Mono', monospace">JetBrains</option>
                     <option value="'Times New Roman', serif">Times New Roman</option>
                     <option value="'Playfair Display', serif">Playfair</option>
-                    <option value="'Montserrat', sans-serif">Montserrat</option>
                     <option value="'Noto Sans TC', sans-serif">思源黑體</option>
                 </select>
             </div>
             <div class="control-group">
-                <span class="label">操作</span>
-                <button onclick="location.reload();">重整頁面</button>
+                <span class="label"></span>
+                <button class="btn-reload" onclick="location.reload();" title="重新整理">
+                    <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                </button>
             </div>
         </div>
 
         <div class="control-row">
             <div class="control-group">
-                <span class="label">字體大小</span>
+                <span class="label">大小</span>
                 <div class="input-pair" onclick="event.stopPropagation()">
-                    <input type="range" id="sizeSlider" min="5" max="80" value="28">
-                    <input type="number" id="sizeNum" class="num-input" value="28">
+                    <input type="range" id="sizeSlider" min="5" max="80" value="18">
+                    <input type="number" id="sizeNum" class="num-input" value="18">
                 </div>
             </div>
             <div class="control-group">
-                <span class="label">字體間距</span>
+                <span class="label">間距</span>
                 <div class="input-pair" onclick="event.stopPropagation()">
                     <input type="range" id="spacingSlider" min="-10" max="100" value="0">
                     <input type="number" id="spacingNum" class="num-input" value="0">
                 </div>
             </div>
             <div class="control-group">
-                <span class="label">背景色</span>
+                <span class="label">背景 / 文字色</span>
                 <div class="input-pair" onclick="event.stopPropagation()">
                     <input type="color" id="bgColorPicker" value="#000000">
                     <input type="text" id="bgHex" class="hex-input" value="#000000" maxlength="7">
-                </div>
-            </div>
-            <div class="control-group">
-                <span class="label">文字色</span>
-                <div class="input-pair" onclick="event.stopPropagation()">
+                    <span style="color:rgba(255,255,255,0.2)">|</span>
                     <input type="color" id="textColorPicker" value="#FFFFFF">
                     <input type="text" id="textHex" class="hex-input" value="#FFFFFF" maxlength="7">
                 </div>
@@ -157,17 +208,14 @@
         function resetTimer() {
             clearTimeout(uiTimer);
             uiTimer = setTimeout(() => {
-                // 如果目前的焦點不在輸入框內，才自動隱藏
                 if (!document.activeElement.tagName.match(/INPUT|SELECT/)) {
                     document.body.classList.remove('show-ui');
-                } else {
-                    resetTimer(); // 如果在輸入，重新計時
-                }
-            }, 6000);
+                } else { resetTimer(); }
+            }, 5000);
         }
 
-        // --- 同步邏輯控制函數 ---
         function syncSize(val) {
+            val = parseFloat(val) || 18;
             document.getElementById('sizeSlider').value = val;
             document.getElementById('sizeNum').value = val;
             clock.style.fontSize = (window.innerHeight < window.innerWidth) ? (val * 1.5) + 'vh' : val + 'vw';
@@ -175,6 +223,7 @@
         }
 
         function syncSpacing(val) {
+            val = parseFloat(val) || 0;
             document.getElementById('spacingSlider').value = val;
             document.getElementById('spacingNum').value = val;
             clock.style.letterSpacing = val + 'px';
@@ -182,6 +231,7 @@
         }
 
         function syncBG(hex) {
+            if (!hex.startsWith('#')) hex = '#' + hex;
             document.getElementById('bgColorPicker').value = hex;
             document.getElementById('bgHex').value = hex.toUpperCase();
             document.documentElement.style.setProperty('--bg-color', hex);
@@ -189,35 +239,24 @@
         }
 
         function syncText(hex) {
+            if (!hex.startsWith('#')) hex = '#' + hex;
             document.getElementById('textColorPicker').value = hex;
             document.getElementById('textHex').value = hex.toUpperCase();
             document.documentElement.style.setProperty('--text-color', hex);
             resetTimer();
         }
 
-        // --- 事件綁定 ---
         document.getElementById('sizeSlider').oninput = (e) => syncSize(e.target.value);
         document.getElementById('sizeNum').onchange = (e) => syncSize(e.target.value);
-
         document.getElementById('spacingSlider').oninput = (e) => syncSpacing(e.target.value);
         document.getElementById('spacingNum').onchange = (e) => syncSpacing(e.target.value);
-
         document.getElementById('bgColorPicker').oninput = (e) => syncBG(e.target.value);
-        document.getElementById('bgHex').onchange = (e) => {
-            let val = e.target.value;
-            if(/^#[0-9A-F]{6}$/i.test(val)) syncBG(val);
-        };
-
+        document.getElementById('bgHex').onchange = (e) => syncBG(e.target.value);
         document.getElementById('textColorPicker').oninput = (e) => syncText(e.target.value);
-        document.getElementById('textHex').onchange = (e) => {
-            let val = e.target.value;
-            if(/^#[0-9A-F]{6}$/i.test(val)) syncText(val);
-        };
-
+        document.getElementById('textHex').onchange = (e) => syncText(e.target.value);
         document.getElementById('fontFamily').onchange = (e) => { clock.style.fontFamily = e.target.value; resetTimer(); };
         document.getElementById('timezoneSelect').onchange = (e) => { selectedTimezone = e.target.value; updateClock(); resetTimer(); };
 
-        // 滑動隱藏
         let touchStartY = 0;
         controls.ontouchstart = (e) => { touchStartY = e.touches[0].clientY; clearTimeout(uiTimer); };
         controls.ontouchend = (e) => {
@@ -227,6 +266,7 @@
 
         setInterval(updateClock, 1000);
         updateClock();
+        syncSize(18);
     </script>
 </body>
 </html>
