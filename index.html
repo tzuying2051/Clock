@@ -32,11 +32,9 @@
             line-height: 1;
             white-space: nowrap;
             user-select: none;
-            /* 預設 18vw 會在 JS 啟動時根據螢幕方向初始化 */
-            font-size: 18vw; 
+            transition: font-size 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 控制面板佈局 */
         #controls {
             position: fixed; bottom: 30px; left: 50%;
             transform: translate(-50%, 0);
@@ -50,11 +48,8 @@
             width: 90vw; max-width: 400px;
         }
 
-        /* 偵測橫向模式 (手機轉過來時) */
         @media (orientation: landscape) {
-            #controls { max-width: 600px; flex-direction: column; }
-            /* 橫屏時字體會自動變大，適配全螢幕感受 */
-            #clock { font-size: 40vh; }
+            #controls { max-width: 600px; }
         }
 
         body.show-ui #controls { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
@@ -62,14 +57,12 @@
 
         .drag-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
         .control-row { display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%; flex-wrap: wrap; }
-
         .control-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
         .label { font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; }
-
         .input-pair { display: flex; align-items: center; gap: 4px; background: var(--input-bg); padding: 4px 8px; border-radius: 8px; width: 100%; justify-content: center; }
 
         select, input, button { border: none; background: transparent; color: #fff; font-size: 12px; outline: none; }
-        .num-input { width: 30px; text-align: center; }
+        .num-input { width: 30px; text-align: center; font-weight: bold; }
         .hex-input { width: 55px; text-align: center; font-size: 10px; }
         input[type="range"] { width: 100%; max-width: 60px; accent-color: #fff; }
         input[type="color"] { width: 20px; height: 20px; border-radius: 50%; padding: 0; border: 1px solid rgba(255,255,255,0.2); }
@@ -96,7 +89,7 @@
                     <option value="Asia/Taipei">台北</option>
                     <option value="Asia/Shanghai">北京</option>
                     <option value="Asia/Tokyo">東京</option>
-                    <option value="America/New_York">紐約</option>
+                    <option value="Europe/Paris">巴黎</option>
                     <option value="Europe/London">倫敦</option>
                 </select>
             </div>
@@ -135,7 +128,7 @@
 
         <div class="control-row">
             <div class="control-group">
-                <span class="label">背景 / 文字</span>
+                <span class="label">背景 / 文字色號</span>
                 <div class="input-pair" onclick="event.stopPropagation()">
                     <input type="color" id="bgColorPicker" value="#000000">
                     <input type="text" id="bgHex" class="hex-input" value="#000000" maxlength="7">
@@ -149,6 +142,7 @@
 
     <script>
         let selectedTimezone = "local";
+        let userAdjustedSize = false; // 追蹤使用者是否調整過字體
         let uiTimer;
         const clock = document.getElementById('clock');
         const controls = document.getElementById('controls');
@@ -179,48 +173,52 @@
         }
 
         function toggleFullScreen() {
-            // 針對 iOS Safari 需要特別處理，如果是 Safari「加入主畫面」後原本就是全螢幕
-            if (!document.fullscreenElement) {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                } else if (document.documentElement.webkitRequestFullscreen) {
                     document.documentElement.webkitRequestFullscreen();
                 }
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
                 }
             }
         }
 
-        function syncSize(val) {
-            val = parseFloat(val) || 18;
+        function syncSize(val, isUserAction = false) {
+            if (isUserAction) userAdjustedSize = true;
+            val = parseFloat(val);
             document.getElementById('sizeSlider').value = val;
             document.getElementById('sizeNum').value = val;
             
-            // 核心修正：根據螢幕方向動態計算字體
             const isLandscape = window.innerWidth > window.innerHeight;
             clock.style.fontSize = isLandscape ? (val * 1.8) + 'vh' : val + 'vw';
             resetTimer();
         }
 
-        function syncSpacing(val) {
-            val = parseFloat(val) || 0;
-            document.getElementById('spacingSlider').value = val;
-            document.getElementById('spacingNum').value = val;
-            clock.style.letterSpacing = val + 'px';
-            resetTimer();
-        }
-
-        // 偵測螢幕旋轉並自動調整字體大小
+        // 當視窗大小改變或旋轉時
         window.addEventListener('resize', () => {
-            syncSize(document.getElementById('sizeSlider').value);
+            const currentSize = document.getElementById('sizeSlider').value;
+            syncSize(currentSize); // 使用當前值重新計算比例，不強制回 18
         });
 
-        document.getElementById('sizeSlider').oninput = (e) => syncSize(e.target.value);
-        document.getElementById('sizeNum').onchange = (e) => syncSize(e.target.value);
-        document.getElementById('spacingSlider').oninput = (e) => syncSpacing(e.target.value);
-        document.getElementById('spacingNum').onchange = (e) => syncSpacing(e.target.value);
+        document.getElementById('sizeSlider').oninput = (e) => syncSize(e.target.value, true);
+        document.getElementById('sizeNum').onchange = (e) => syncSize(e.target.value, true);
+
+        document.getElementById('spacingSlider').oninput = (e) => {
+            clock.style.letterSpacing = e.target.value + 'px';
+            document.getElementById('spacingNum').value = e.target.value;
+            resetTimer();
+        };
+        document.getElementById('spacingNum').onchange = (e) => {
+            clock.style.letterSpacing = e.target.value + 'px';
+            document.getElementById('spacingSlider').value = e.target.value;
+            resetTimer();
+        };
+
         document.getElementById('bgColorPicker').oninput = (e) => {
             document.documentElement.style.setProperty('--bg-color', e.target.value);
             document.getElementById('bgHex').value = e.target.value.toUpperCase();
@@ -230,7 +228,6 @@
             document.getElementById('textHex').value = e.target.value.toUpperCase();
         };
 
-        // 下滑隱藏
         let touchStartY = 0;
         controls.ontouchstart = (e) => { touchStartY = e.touches[0].clientY; clearTimeout(uiTimer); };
         controls.ontouchend = (e) => {
@@ -240,7 +237,8 @@
 
         setInterval(updateClock, 1000);
         updateClock();
-        // 初始設定預設字號 18
+        
+        // 只有初始加載時設定為 18
         syncSize(18);
     </script>
 </body>
