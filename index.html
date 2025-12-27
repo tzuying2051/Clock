@@ -3,121 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>最好用的時鐘</title>
-    
+    <title>極致精準對時鐘</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg-color: #000000; 
-            --text-color: #ffffff;
-            --panel-bg: rgba(30, 30, 30, 0.96);
-            --input-bg: rgba(255, 255, 255, 0.12);
-        }
-
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-            background-color: var(--bg-color); color: var(--text-color);
-            display: flex; justify-content: center; align-items: center;
-            font-family: 'JetBrains Mono', sans-serif;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-        }
-
-        #clock {
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            line-height: 1;
-            white-space: nowrap;
-            user-select: none;
-            transition: font-size 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #controls {
-            position: fixed; bottom: 25px; left: 50%;
-            transform: translate(-50%, 0);
-            background: var(--panel-bg);
-            padding: 18px; border-radius: 28px;
-            display: flex; flex-direction: column; align-items: center; gap: 16px;
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            opacity: 0; visibility: hidden;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
-            z-index: 100; border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 92vw; max-width: 460px;
-        }
-
+        :root { --bg-color: #000000; --text-color: #ffffff; --panel-bg: rgba(28, 28, 30, 0.85); --input-bg: rgba(255, 255, 255, 0.12); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; font-family: 'JetBrains Mono', monospace; transition: background 0.3s; }
+        #clock { font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; user-select: none; z-index: 1; pointer-events: none; }
+        #controls { position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 150%); background: var(--panel-bg); padding: 20px; border-radius: 32px; display: flex; flex-direction: row; gap: 20px; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); opacity: 0; visibility: hidden; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s; z-index: 100; border: 1px solid rgba(255, 255, 255, 0.15); width: auto; max-width: 95vw; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow-x: auto; }
         body.show-ui #controls { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-        body:not(.show-ui) #controls { transform: translate(-50%, 100px); }
-
-        .drag-handle { width: 32px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
-        
-        /* 核心修正：確保同一行內所有元素絕對置中對齊 */
-        .control-row { 
-            display: flex; 
-            gap: 12px; 
-            align-items: center; /* 關鍵：垂直置中 */
-            justify-content: center; 
-            width: 100%; 
-        }
-
-        .control-group { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 5px; 
-            flex: 1; 
-            position: relative;
-        }
-
-        .label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .input-pair { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            background: var(--input-bg); 
-            padding: 7px 12px; 
-            border-radius: 12px; 
-            width: 100%; 
-            height: 42px; /* 固定高度確保對齊 */
-            box-sizing: border-box;
-            justify-content: center; 
-        }
-
-        select, input, button { 
-            border: none; background: transparent; color: #fff; 
-            font-size: 13px; outline: none; width: 100%; 
-            font-family: inherit;
-        }
-
-        .num-input { width: 38px; text-align: center; font-weight: bold; }
-        .hex-input { width: 68px; text-align: center; font-size: 11px; text-transform: uppercase; }
-        
-        input[type="range"] { flex: 1; cursor: pointer; accent-color: #fff; }
-        input[type="color"] { width: 22px; height: 22px; border-radius: 50%; padding: 0; border: 1.5px solid rgba(255,255,255,0.2); flex: none; cursor: pointer; }
-
-        /* 按鈕垂直對齊修正 */
-        .btn-icon {
-            background: rgba(255,255,255,0.1); 
-            width: 42px; height: 42px; /* 與 .input-pair 高度一致 */
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; 
-            flex: none;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        .col { display: flex; flex-direction: column; gap: 10px; min-width: 150px; flex-shrink: 0; }
+        .group { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; }
+        .label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+        .box { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--input-bg); padding: 10px; border-radius: 18px; width: 100%; box-sizing: border-box; }
+        .row { display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; }
+        input[type="number"], input[type="text"], select { background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 11px; text-align: center; padding: 4px; border-radius: 6px; font-family: inherit; outline: none; }
+        .btn-adj { background: rgba(255,255,255,0.15); height: 30px; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; border: none; font-size: 11px; flex: 1; }
+        .btn-adj:active { background: rgba(255,255,255,0.3); }
+        .btn-icon { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
         .btn-icon:hover { background: rgba(255,255,255,0.2); }
-        .btn-icon svg { width: 20px; height: 20px; fill: white; }
-        
-        .desktop-note { 
-            font-size: 8px; 
-            color: rgba(255,255,255,0.3); 
-            position: absolute; 
-            bottom: -15px; 
-            white-space: nowrap; 
-        }
+        input[type="range"] { width: 100%; accent-color: #fff; cursor: pointer; }
+        input[type="color"] { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); padding: 0; cursor: pointer; }
+        @media (max-width: 900px) { #controls { padding: 15px; gap: 12px; } .col { min-width: 130px; } }
     </style>
 </head>
 <body onclick="handleBodyClick(event)">
@@ -125,194 +33,150 @@
     <div id="clock">00:00:00</div>
 
     <div id="controls">
-        <div class="drag-handle"></div>
-        
-        <div class="control-row">
-            <div class="control-group">
+        <div class="col">
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="btn-icon" onclick="location.reload();"><svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
+                <div class="btn-icon" onclick="toggleFullScreen();"><svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></div>
+            </div>
+            <div class="group">
+                <span class="label">時間微調 / Offset</span>
+                <div class="box" onclick="event.stopPropagation()">
+                    <div class="row">
+                        <button class="btn-adj" onclick="adj(100)">+0.1s</button>
+                        <button class="btn-adj" onclick="adj(-100)">-0.1s</button>
+                    </div>
+                    <div id="offVal" style="color:#30d158; font-weight:bold; font-size:13px;">+0.0s</div>
+                    <button onclick="adj(0,true)" style="font-size:9px; opacity:0.5; text-decoration:underline; color:white; border:none; background:none; cursor:pointer;">重設歸零</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col" style="min-width: 170px;">
+            <div class="group">
+                <span class="label">時間格式與字體</span>
+                <div class="box">
+                    <select id="hMode" style="width:100%;" onchange="resetTimer()">
+                        <option value="24">24 小時制 (24H)</option>
+                        <option value="12">12 小時制 (12H)</option>
+                    </select>
+                    <select id="fFam" style="width:100%; margin-top:5px;" onchange="updateF(this.value)">
+                        <option value="'JetBrains Mono'">JetBrains Mono</option>
+                        <option value="'Noto Sans TC'">思源黑體</option>
+                        <option value="'Noto Serif TC'">思源宋體</option>
+                        <option value="'Montserrat'">Montserrat</option>
+                        <option value="'Roboto Mono'">Roboto Mono</option>
+                        <option value="'Playfair Display'">Playfair Display</option>
+                    </select>
+                </div>
+            </div>
+            <div class="group">
                 <span class="label">時區選單</span>
-                <div class="input-pair">
-                    <select id="timezoneSelect" onclick="event.stopPropagation()">
-                        <option value="local">本地時間 (Local)</option>
-                        <option value="Asia/Taipei">台北 (Taipei) [GMT+8]</option>
-                        <option value="Asia/Shanghai">北京 (Beijing) [GMT+8]</option>
-                        <option value="Asia/Hong_Kong">香港 (Hong Kong) [GMT+8]</option>
-                        <option value="Asia/Singapore">新加坡 (Singapore) [GMT+8]</option>
-                        <option value="Asia/Seoul">首爾 (Seoul) [GMT+9]</option>
-                        <option value="Asia/Tokyo">東京 (Tokyo) [GMT+9]</option>
-                        <option value="Asia/Bangkok">曼谷 (Bangkok) [GMT+7]</option>
-                        <option value="Australia/Sydney">雪梨 (Sydney) [GMT+11]</option>
-                        <option value="Europe/Paris">巴黎 (Paris) [GMT+1]</option>
-                        <option value="Europe/London">倫敦 (London) [GMT+0]</option>
-                        <option value="America/New_York">紐約 (New York) [GMT-5]</option>
-                        <option value="America/Los_Angeles">洛杉磯 (L.A.) [GMT-8]</option>
-                        <option value="UTC">標準時間 (UTC) [GMT+0]</option>
+                <div class="box">
+                    <select id="tZone" style="width:100%;" onchange="resetTimer()">
+                        <option value="local">本地時間 Local</option>
+                        <option value="Asia/Taipei">台北 Taipei (GMT+8)</option>
+                        <option value="Asia/Shanghai">北京 Beijing (GMT+8)</option>
+                        <option value="Asia/Hong_Kong">香港 Hong Kong (GMT+8)</option>
+                        <option value="Asia/Tokyo">東京 Tokyo (GMT+9)</option>
+                        <option value="Asia/Seoul">首爾 Seoul (GMT+9)</option>
+                        <option value="Europe/London">倫敦 London (GMT+0)</option>
+                        <option value="Europe/Paris">巴黎 Paris (GMT+1)</option>
+                        <option value="America/New_York">紐約 New York (GMT-5)</option>
+                        <option value="America/Los_Angeles">洛杉磯 L.A. (GMT-8)</option>
+                        <option value="Australia/Sydney">雪梨 Sydney (GMT+11)</option>
+                        <option value="Pacific/Auckland">奧克蘭 Auckland (GMT+13)</option>
+                        <option value="Asia/Dubai">杜拜 Dubai (GMT+4)</option>
+                        <option value="UTC">標準時間 UTC (GMT+0)</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <div class="control-row">
-            <div class="control-group" style="flex: 2;">
-                <span class="label">字體選擇</span>
-                <div class="input-pair">
-                    <select id="fontFamily" onclick="event.stopPropagation()">
-                        <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
-                        <option value="'Times New Roman', serif">Times New Roman</option>
-                        <option value="'Playfair Display', serif">Playfair Display</option>
-                        <option value="'Montserrat', sans-serif">Montserrat</option>
-                        <option value="'Noto Sans TC', sans-serif">思源黑體</option>
-                        <option value="'Noto Serif TC', serif">思源宋體</option>
-                    </select>
+        <div class="col">
+            <div class="group">
+                <span class="label">字體大小 / Size</span>
+                <div class="box" onclick="event.stopPropagation()">
+                    <input type="range" id="sSli" min="5" max="80" value="18" oninput="sSync(this.value)">
+                    <input type="number" id="sNum" value="18" onchange="sSync(this.value)" style="width:50px;">
                 </div>
             </div>
-            
-            <div class="control-group" style="flex: none; align-self: flex-end;">
-                <button class="btn-icon" onclick="location.reload();" title="重新整理">
-                    <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                </button>
-            </div>
-
-            <div class="control-group" style="flex: none; align-self: flex-end;">
-                <button class="btn-icon" onclick="toggleFullScreen();" title="電腦全螢幕">
-                    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                </button>
-                <span class="desktop-note">僅限電腦</span>
-            </div>
-        </div>
-
-        <div class="control-row">
-            <div class="control-group">
-                <span class="label">大小</span>
-                <div class="input-pair" onclick="event.stopPropagation()">
-                    <input type="range" id="sizeSlider" min="5" max="80" value="18">
-                    <input type="number" id="sizeNum" class="num-input" value="18">
-                </div>
-            </div>
-            <div class="control-group">
-                <span class="label">間距</span>
-                <div class="input-pair" onclick="event.stopPropagation()">
-                    <input type="range" id="spacingSlider" min="-10" max="100" value="0">
-                    <input type="number" id="spacingNum" class="num-input" value="0">
+            <div class="group">
+                <span class="label">字體間距 / Spacing</span>
+                <div class="box" onclick="event.stopPropagation()">
+                    <input type="range" id="spSli" min="-10" max="50" value="0" oninput="spSync(this.value)">
+                    <input type="number" id="spNum" value="0" onchange="spSync(this.value)" style="width:50px;">
                 </div>
             </div>
         </div>
 
-        <div class="control-row">
-            <div class="control-group">
-                <span class="label">背景與文字顏色</span>
-                <div class="input-pair" onclick="event.stopPropagation()">
-                    <input type="color" id="bgColorPicker" value="#000000">
-                    <input type="text" id="bgHex" class="hex-input" value="#000000" maxlength="7">
-                    <span style="opacity: 0.2; margin: 0 4px;">|</span>
-                    <input type="color" id="textColorPicker" value="#FFFFFF">
-                    <input type="text" id="textHex" class="hex-input" value="#FFFFFF" maxlength="7">
+        <div class="col">
+            <div class="group">
+                <span class="label">顏色設定 (背景/文字)</span>
+                <div class="box" onclick="event.stopPropagation()">
+                    <div class="row">
+                        <input type="color" id="bgC" value="#000000" oninput="cSync('bg',this.value)">
+                        <input type="text" id="bgH" value="#000000" onchange="cSync('bg',this.value)" style="width:65px;">
+                    </div>
+                    <div class="row" style="margin-top:5px;">
+                        <input type="color" id="txC" value="#FFFFFF" oninput="cSync('tx',this.value)">
+                        <input type="text" id="txH" value="#FFFFFF" onchange="cSync('tx',this.value)" style="width:65px;">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let selectedTimezone = "local";
-        let uiTimer;
-        const clock = document.getElementById('clock');
-        const controls = document.getElementById('controls');
+        let offset = 0, uiT;
+        const clock = document.getElementById('clock'), controls = document.getElementById('controls');
 
-        function updateClock() {
-            const now = new Date();
-            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-            if (selectedTimezone !== "local") options.timeZone = selectedTimezone;
-            try {
-                let timeParts = now.toLocaleTimeString('en-GB', options).split(':');
-                clock.textContent = `${timeParts[0].padStart(2, '0')}:${timeParts[1]}:${timeParts[2]}`;
-            } catch(e) {}
+        function update() {
+            const now = new Date(Date.now() + offset);
+            const mode = document.getElementById('hMode').value;
+            const tz = document.getElementById('tZone').value;
+            const opt = { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: mode==='12' };
+            if(tz !== 'local') opt.timeZone = tz;
+            clock.textContent = now.toLocaleTimeString('en-GB', opt).replace(/[APM]/g, '').trim();
         }
 
-        function handleBodyClick(e) {
-            if (controls.contains(e.target)) return;
-            document.body.classList.toggle('show-ui');
-            if (document.body.classList.contains('show-ui')) resetTimer();
+        function adj(ms, reset=false) {
+            offset = reset ? 0 : offset + ms;
+            const s = (offset/1000).toFixed(1);
+            document.getElementById('offVal').textContent = (s>=0?"+":"")+s+"s";
+            resetTimer();
         }
 
-        function resetTimer() {
-            clearTimeout(uiTimer);
-            uiTimer = setTimeout(() => {
-                if (!document.activeElement.tagName.match(/INPUT|SELECT/)) {
-                    document.body.classList.remove('show-ui');
-                }
-            }, 5000);
+        function sSync(v) {
+            document.getElementById('sSli').value = v; document.getElementById('sNum').value = v;
+            clock.style.fontSize = (window.innerWidth > window.innerHeight) ? (v*1.8)+'vh' : v+'vw';
+            resetTimer();
         }
+
+        function spSync(v) {
+            document.getElementById('spSli').value = v; document.getElementById('spNum').value = v;
+            clock.style.letterSpacing = v+'px'; resetTimer();
+        }
+
+        function cSync(t, v) {
+            if(!v.startsWith('#')) v = '#'+v;
+            if(t==='bg') { document.documentElement.style.setProperty('--bg-color', v); document.getElementById('bgC').value = v; document.getElementById('bgH').value = v.toUpperCase(); }
+            else { document.documentElement.style.setProperty('--text-color', v); document.getElementById('txC').value = v; document.getElementById('txH').value = v.toUpperCase(); }
+            resetTimer();
+        }
+
+        function updateF(v) { clock.style.fontFamily = v; resetTimer(); }
+
+        function handleBodyClick(e) { if(!controls.contains(e.target)) { document.body.classList.toggle('show-ui'); if(document.body.classList.contains('show-ui')) resetTimer(); } }
+
+        function resetTimer() { clearTimeout(uiT); uiT = setTimeout(() => { if(!document.activeElement.tagName.match(/INPUT|SELECT/)) document.body.classList.remove('show-ui'); }, 5000); }
 
         function toggleFullScreen() {
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    document.documentElement.webkitRequestFullscreen();
-                }
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            }
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
         }
 
-        function syncSize(val) {
-            val = parseFloat(val);
-            document.getElementById('sizeSlider').value = val;
-            document.getElementById('sizeNum').value = val;
-            const isLandscape = window.innerWidth > window.innerHeight;
-            clock.style.fontSize = isLandscape ? (val * 1.8) + 'vh' : val + 'vw';
-            resetTimer();
-        }
-
-        window.addEventListener('resize', () => {
-            syncSize(document.getElementById('sizeSlider').value);
-        });
-
-        document.getElementById('sizeSlider').oninput = (e) => syncSize(e.target.value);
-        document.getElementById('sizeNum').onchange = (e) => syncSize(e.target.value);
-        document.getElementById('spacingSlider').oninput = (e) => {
-            clock.style.letterSpacing = e.target.value + 'px';
-            document.getElementById('spacingNum').value = e.target.value;
-            resetTimer();
-        };
-        document.getElementById('spacingNum').onchange = (e) => {
-            clock.style.letterSpacing = e.target.value + 'px';
-            document.getElementById('spacingSlider').value = e.target.value;
-            resetTimer();
-        };
-        document.getElementById('bgColorPicker').oninput = (e) => {
-            document.documentElement.style.setProperty('--bg-color', e.target.value);
-            document.getElementById('bgHex').value = e.target.value.toUpperCase();
-        };
-        document.getElementById('textColorPicker').oninput = (e) => {
-            document.documentElement.style.setProperty('--text-color', e.target.value);
-            document.getElementById('textHex').value = e.target.value.toUpperCase();
-        };
-        document.getElementById('bgHex').onchange = (e) => {
-            let val = e.target.value;
-            if(!val.startsWith('#')) val = '#' + val;
-            document.documentElement.style.setProperty('--bg-color', val);
-            document.getElementById('bgColorPicker').value = val;
-        };
-        document.getElementById('textHex').onchange = (e) => {
-            let val = e.target.value;
-            if(!val.startsWith('#')) val = '#' + val;
-            document.documentElement.style.setProperty('--text-color', val);
-            document.getElementById('textColorPicker').value = val;
-        };
-        document.getElementById('fontFamily').onchange = (e) => { clock.style.fontFamily = e.target.value; resetTimer(); };
-        document.getElementById('timezoneSelect').onchange = (e) => { selectedTimezone = e.target.value; updateClock(); resetTimer(); };
-
-        let touchStartY = 0;
-        controls.ontouchstart = (e) => { touchStartY = e.touches[0].clientY; clearTimeout(uiTimer); };
-        controls.ontouchend = (e) => {
-            if (e.changedTouches[0].clientY - touchStartY > 35) document.body.classList.remove('show-ui');
-            else resetTimer();
-        };
-
-        setInterval(updateClock, 1000);
-        updateClock();
-        syncSize(18);
+        setInterval(update, 100);
+        sSync(18);
     </script>
 </body>
 </html>
