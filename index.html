@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>極致精準對時鐘</title>
+    <title>極致精準對時鐘 - 最終版</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #000000; --text-color: #ffffff; --panel-bg: rgba(28, 28, 30, 0.9); --input-bg: rgba(255, 255, 255, 0.12); }
@@ -11,7 +11,6 @@
         
         #clock { font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; user-select: none; z-index: 1; pointer-events: none; }
         
-        /* 底部控制面板 - 增加手機滑動支援 */
         #controls { 
             position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 150%); 
             background: var(--panel-bg); padding: 20px; border-radius: 32px; 
@@ -19,34 +18,31 @@
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
             opacity: 0; visibility: hidden; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s; 
             z-index: 100; border: 1px solid rgba(255, 255, 255, 0.15); 
-            width: 90vw; max-width: 900px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            overflow-x: auto; /* 開啟橫向滾動 */
-            -webkit-overflow-scrolling: touch; /* 確保 iOS 滑動順暢 */
-            scrollbar-width: none; /* 隱藏電腦版滾動條 */
+            width: 92vw; max-width: 950px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
-        #controls::-webkit-scrollbar { display: none; } /* 隱藏 Chrome 滾動條 */
-        
+        #controls::-webkit-scrollbar { display: none; }
         body.show-ui #controls { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
 
-        .col { display: flex; flex-direction: column; gap: 10px; min-width: 160px; flex-shrink: 0; }
+        .col { display: flex; flex-direction: column; gap: 10px; min-width: 170px; flex-shrink: 0; }
         .group { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; }
-        .label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+        .label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; text-align: center; }
         .box { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--input-bg); padding: 10px; border-radius: 18px; width: 100%; box-sizing: border-box; }
         
         select { 
-            appearance: none; -webkit-appearance: none;
-            background: rgba(255,255,255,0.1); border: none; color: #fff; 
-            font-size: 11px; text-align: center; padding: 6px; border-radius: 8px; 
-            width: 100%; cursor: pointer; outline: none;
+            appearance: none; -webkit-appearance: none; background: rgba(255,255,255,0.1); 
+            border: none; color: #fff; font-size: 11px; text-align: center; padding: 6px; 
+            border-radius: 8px; width: 100%; cursor: pointer; outline: none;
         }
         select option { background-color: #1c1c1e !important; color: #ffffff !important; }
 
-        .btn-adj { background: rgba(255,255,255,0.15); height: 30px; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; border: none; font-size: 11px; flex: 1; }
-        .btn-icon { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-adj { background: rgba(255,255,255,0.15); height: 32px; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; border: none; font-size: 11px; flex: 1; transition: 0.2s; }
+        .btn-adj:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
+        .btn-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
         
-        input[type="number"], input[type="text"] { background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 11px; text-align: center; padding: 4px; border-radius: 6px; outline: none; }
+        input[type="number"], input[type="text"] { background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 11px; text-align: center; padding: 5px; border-radius: 6px; outline: none; }
         input[type="range"] { width: 100%; accent-color: #fff; }
-        input[type="color"] { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); padding: 0; cursor: pointer; }
+        input[type="color"] { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); padding: 0; cursor: pointer; }
     </style>
 </head>
 <body onclick="handleBodyClick(event)">
@@ -55,24 +51,24 @@
 
     <div id="controls">
         <div class="col">
-            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 5px;">
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 5px;">
                 <div class="btn-icon" onclick="location.reload();"><svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
                 <div class="btn-icon" onclick="toggleFullScreen();"><svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></div>
             </div>
             <div class="group">
                 <span class="label">時間微調 / OFFSET</span>
                 <div class="box" onclick="event.stopPropagation()">
-                    <div style="display: flex; gap: 5px; width: 100%;">
+                    <div style="display: flex; gap: 6px; width: 100%;">
                         <button class="btn-adj" onclick="adj(100)">+0.1s</button>
                         <button class="btn-adj" onclick="adj(-100)">-0.1s</button>
                     </div>
-                    <div id="offVal" style="color:#30d158; font-weight:bold; font-size:13px;">+0.0s</div>
-                    <button onclick="adj(0,true)" style="font-size:9px; opacity:0.5; color:white; background:none; border:none; cursor:pointer; text-decoration:underline;">重設歸零</button>
+                    <div id="offVal" style="color:#30d158; font-weight:bold; font-size:14px; margin: 2px 0;">+0.0s</div>
+                    <button onclick="adj(0,true)" style="font-size:9px; opacity:0.6; color:white; background:none; border:none; cursor:pointer; text-decoration:underline;">重設歸零</button>
                 </div>
             </div>
         </div>
 
-        <div class="col" style="min-width: 180px;">
+        <div class="col" style="min-width: 200px;">
             <div class="group">
                 <span class="label">時間格式與字體</span>
                 <div class="box">
@@ -82,8 +78,8 @@
                     </select>
                     <select id="fFam" style="margin-top:5px;" onchange="updateF(this.value)">
                         <option value="'JetBrains Mono'">JetBrains Mono</option>
-                        <option value="'Noto Sans TC'">思源黑體</option>
-                        <option value="'Noto Serif TC'">思源宋體</option>
+                        <option value="'Noto Sans TC'">思源黑體 (Noto Sans)</option>
+                        <option value="'Noto Serif TC'">思源宋體 (Noto Serif)</option>
                         <option value="'Montserrat'">Montserrat</option>
                         <option value="'Roboto Mono'">Roboto Mono</option>
                         <option value="'Playfair Display'">Playfair Display</option>
@@ -103,8 +99,10 @@
                         <option value="Europe/London">倫敦 London (GMT+0)</option>
                         <option value="Europe/Paris">巴黎 Paris (GMT+1)</option>
                         <option value="America/New_York">紐約 New York (GMT-5)</option>
+                        <option value="America/Los_Angeles">洛杉磯 L.A. (GMT-8)</option>
                         <option value="Australia/Sydney">雪梨 Sydney (GMT+11)</option>
-                        <option value="UTC">世界標準 UTC (GMT+0)</option>
+                        <option value="Pacific/Auckland">奧克蘭 Auckland (GMT+13)</option>
+                        <option value="UTC">標準時間 UTC (GMT+0)</option>
                     </select>
                 </div>
             </div>
@@ -115,29 +113,29 @@
                 <span class="label">字體大小 / SIZE</span>
                 <div class="box" onclick="event.stopPropagation()">
                     <input type="range" id="sSli" min="5" max="80" value="18" oninput="sSync(this.value)">
-                    <input type="number" id="sNum" value="18" onchange="sSync(this.value)" style="width:50px;">
+                    <input type="number" id="sNum" value="18" onchange="sSync(this.value)" style="width:55px;">
                 </div>
             </div>
             <div class="group">
                 <span class="label">字體間距 / SPACING</span>
                 <div class="box" onclick="event.stopPropagation()">
                     <input type="range" id="spSli" min="-10" max="50" value="0" oninput="spSync(this.value)">
-                    <input type="number" id="spNum" value="0" onchange="spSync(this.value)" style="width:50px;">
+                    <input type="number" id="spNum" value="0" onchange="spSync(this.value)" style="width:55px;">
                 </div>
             </div>
         </div>
 
         <div class="col">
             <div class="group">
-                <span class="label">顏色設定 (HEX)</span>
+                <span class="label">色彩設定 (HEX)</span>
                 <div class="box" onclick="event.stopPropagation()">
-                    <div style="display:flex; align-items:center; gap:5px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
                         <input type="color" id="bgC" value="#000000" oninput="cSync('bg',this.value)">
-                        <input type="text" id="bgH" value="#000000" onchange="cSync('bg',this.value)" style="width:65px;">
+                        <input type="text" id="bgH" value="#000000" onchange="cSync('bg',this.value)" style="width:70px;">
                     </div>
-                    <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
                         <input type="color" id="txC" value="#FFFFFF" oninput="cSync('tx',this.value)">
-                        <input type="text" id="txH" value="#FFFFFF" onchange="cSync('tx',this.value)" style="width:65px;">
+                        <input type="text" id="txH" value="#FFFFFF" onchange="cSync('tx',this.value)" style="width:70px;">
                     </div>
                 </div>
             </div>
@@ -154,7 +152,7 @@
             const tz = document.getElementById('tZone').value;
             const opt = { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: mode==='12' };
             if(tz !== 'local') opt.timeZone = tz;
-            clock.textContent = now.toLocaleTimeString('en-GB', opt);
+            clock.textContent = now.toLocaleTimeString('en-GB', opt).replace(/[APM]/g, '').trim();
         }
 
         function adj(ms, reset=false) {
