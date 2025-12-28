@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>極致精準對時鐘 - 最終版</title>
+    <title>原子鐘同步精準時鐘</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #000000; --text-color: #ffffff; --panel-bg: rgba(28, 28, 30, 0.9); --input-bg: rgba(255, 255, 255, 0.12); }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; font-family: 'JetBrains Mono', monospace; }
         
         #clock { font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; user-select: none; z-index: 1; pointer-events: none; }
-        
+        #sync-status { position: fixed; top: 20px; font-size: 10px; opacity: 0.5; letter-spacing: 1px; }
+
+        /* 底部控制面板 - 支援橫向滑動 */
         #controls { 
             position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 150%); 
             background: var(--panel-bg); padding: 20px; border-radius: 32px; 
@@ -18,7 +20,7 @@
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
             opacity: 0; visibility: hidden; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s; 
             z-index: 100; border: 1px solid rgba(255, 255, 255, 0.15); 
-            width: 92vw; max-width: 950px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 92vw; max-width: 1000px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
         #controls::-webkit-scrollbar { display: none; }
@@ -26,9 +28,10 @@
 
         .col { display: flex; flex-direction: column; gap: 10px; min-width: 170px; flex-shrink: 0; }
         .group { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; }
-        .label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+        .label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
         .box { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--input-bg); padding: 10px; border-radius: 18px; width: 100%; box-sizing: border-box; }
         
+        /* 修正電腦選單白色塊問題 */
         select { 
             appearance: none; -webkit-appearance: none; background: rgba(255,255,255,0.1); 
             border: none; color: #fff; font-size: 11px; text-align: center; padding: 6px; 
@@ -36,8 +39,7 @@
         }
         select option { background-color: #1c1c1e !important; color: #ffffff !important; }
 
-        .btn-adj { background: rgba(255,255,255,0.15); height: 32px; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; border: none; font-size: 11px; flex: 1; transition: 0.2s; }
-        .btn-adj:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
+        .btn-adj { background: rgba(255,255,255,0.15); height: 32px; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; border: none; font-size: 11px; flex: 1; }
         .btn-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
         
         input[type="number"], input[type="text"] { background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 11px; text-align: center; padding: 5px; border-radius: 6px; outline: none; }
@@ -47,6 +49,7 @@
 </head>
 <body onclick="handleBodyClick(event)">
 
+    <div id="sync-status">正在與網路原子鐘同步...</div>
     <div id="clock">00:00:00</div>
 
     <div id="controls">
@@ -62,7 +65,7 @@
                         <button class="btn-adj" onclick="adj(100)">+0.1s</button>
                         <button class="btn-adj" onclick="adj(-100)">-0.1s</button>
                     </div>
-                    <div id="offVal" style="color:#30d158; font-weight:bold; font-size:14px; margin: 2px 0;">+0.0s</div>
+                    <div id="offVal" style="color:#30d158; font-weight:bold; font-size:14px;">+0.0s</div>
                     <button onclick="adj(0,true)" style="font-size:9px; opacity:0.6; color:white; background:none; border:none; cursor:pointer; text-decoration:underline;">重設歸零</button>
                 </div>
             </div>
@@ -70,7 +73,7 @@
 
         <div class="col" style="min-width: 200px;">
             <div class="group">
-                <span class="label">時間格式與字體</span>
+                <span class="label">顯示格式與字體</span>
                 <div class="box">
                     <select id="hMode" onchange="resetTimer()">
                         <option value="24">24 小時制 (24H)</option>
@@ -87,7 +90,7 @@
                 </div>
             </div>
             <div class="group">
-                <span class="label">全球時區選擇</span>
+                <span class="label">全球時區選擇 (15+)</span>
                 <div class="box">
                     <select id="tZone" onchange="resetTimer()">
                         <option value="local">本地時間 Local</option>
@@ -102,6 +105,8 @@
                         <option value="America/Los_Angeles">洛杉磯 L.A. (GMT-8)</option>
                         <option value="Australia/Sydney">雪梨 Sydney (GMT+11)</option>
                         <option value="Pacific/Auckland">奧克蘭 Auckland (GMT+13)</option>
+                        <option value="Asia/Dubai">杜拜 Dubai (GMT+4)</option>
+                        <option value="Asia/Bangkok">曼谷 Bangkok (GMT+7)</option>
                         <option value="UTC">標準時間 UTC (GMT+0)</option>
                     </select>
                 </div>
@@ -127,7 +132,7 @@
 
         <div class="col">
             <div class="group">
-                <span class="label">色彩設定 (HEX)</span>
+                <span class="label">顏色設定 (HEX)</span>
                 <div class="box" onclick="event.stopPropagation()">
                     <div style="display:flex; align-items:center; gap:8px;">
                         <input type="color" id="bgC" value="#000000" oninput="cSync('bg',this.value)">
@@ -143,21 +148,38 @@
     </div>
 
     <script>
-        let offset = 0, uiT;
+        let serverOffset = 0, manualOffset = 0, uiT;
         const clock = document.getElementById('clock'), controls = document.getElementById('controls');
 
+        // 1. 原子鐘同步功能 (使用 WorldTimeAPI)
+        async function syncWithServer() {
+            try {
+                const start = Date.now();
+                const res = await fetch('https://worldtimeapi.org/api/ip');
+                const data = await res.json();
+                const end = Date.now();
+                const latency = (end - start) / 2;
+                const actualServerTime = new Date(data.datetime).getTime() + latency;
+                serverOffset = actualServerTime - end;
+                document.getElementById('sync-status').textContent = "已成功與網路原子鐘同步 (Sync OK)";
+                setTimeout(() => document.getElementById('sync-status').style.display = 'none', 3000);
+            } catch (e) {
+                document.getElementById('sync-status').textContent = "同步失敗，使用系統時間 (Sync Failed)";
+            }
+        }
+
         function update() {
-            const now = new Date(Date.now() + offset);
+            const now = new Date(Date.now() + serverOffset + manualOffset);
             const mode = document.getElementById('hMode').value;
             const tz = document.getElementById('tZone').value;
             const opt = { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: mode==='12' };
             if(tz !== 'local') opt.timeZone = tz;
-            clock.textContent = now.toLocaleTimeString('en-GB', opt).replace(/[APM]/g, '').trim();
+            clock.textContent = now.toLocaleTimeString('en-GB', opt);
         }
 
         function adj(ms, reset=false) {
-            offset = reset ? 0 : offset + ms;
-            const s = (offset/1000).toFixed(1);
+            manualOffset = reset ? 0 : manualOffset + ms;
+            const s = (manualOffset/1000).toFixed(1);
             document.getElementById('offVal').textContent = (s>=0?"+":"")+s+"s";
             resetTimer();
         }
@@ -185,6 +207,7 @@
         function resetTimer() { clearTimeout(uiT); uiT = setTimeout(() => { if(!document.activeElement.tagName.match(/INPUT|SELECT/)) document.body.classList.remove('show-ui'); }, 5000); }
         function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
 
+        syncWithServer();
         setInterval(update, 100);
         sSync(18);
     </script>
